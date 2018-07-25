@@ -371,7 +371,7 @@ if p < m:
 
 if not xy_flipped and not yz_flipped and not xz_flipped:
     print("no flip!")
-    results['brainlife'].append({"type": "info", "msg": "bvecs is not flipped!"})
+    results['brainlife'].append({"type": "info", "msg": "No flip required!"})
 
 if xy_flipped and xz_flipped:
     print("x is flipped !")
