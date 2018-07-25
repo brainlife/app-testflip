@@ -1,0 +1,8 @@
+#!/bin/bash
+
+#PBS -l nodes=1:ppn=1
+#PBS -l vmem=8gb
+#PBS -l walltime=00:05:00
+
+singularity exec docker://brainlife/dipy:0.14 ./detect.py
+
