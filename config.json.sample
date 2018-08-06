@@ -1,6 +1,6 @@
 {
-    "dwi": "testdata/dwi.nii.gz",
-    "bvecs": "testdata/dwi.bvecs",
-    "bvals": "testdata/dwi.bvals"
+    "dwi": "testdata/bold5000/dwi.nii.gz",
+    "bvecs": "testdata/bold5000/dwi.bvecs",
+    "bvals": "testdata/bold5000/dwi.bvals"
 }
 
