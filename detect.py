@@ -122,7 +122,7 @@ try:
         results['storage_orientation'] = 'neurological'
         print('storage_orientation: neurological - flipping x')
         warning("storage orientation is neurologial (det>0). Watch out!")
-        results['tags'].append("neurological")
+        results['tags'] = ["neurological"]
 
 except Exception as e:
     error("nibabel failed on dwi. error code: " + str(e))
