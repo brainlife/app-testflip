@@ -235,31 +235,26 @@ flip_v = []
 print("testing x/y flip... %d z-slices" % vol_x1.shape[2])
 p=0
 m=0
-sum=0
 for i in range(vol_x1.shape[2]):
     
     slice1 = vol_x1[:, :, i]
     slice2 = vol_x2[:, :, i]
   
-    pos = np.subtract(slice1, slice2)#.clip(min=0)
+    pos = np.subtract(slice1, slice2).clip(min=0)
     pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
-    #neg = np.subtract(slice2, slice1).clip(min=0)
-    #neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
+    neg = np.subtract(slice2, slice1).clip(min=0)
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
 
     l=np.std(sum_diag(pos, 1))
     r=np.std(sum_diag(pos, -1))
-    #l+=np.std(sum_diag(neg, -1))
-    #r+=np.std(sum_diag(neg, 1))
-    sum+=l
-    sum-=r
+    l+=np.std(sum_diag(neg, -1))
+    r+=np.std(sum_diag(neg, 1))
     if l<=r:
         p+=1.0
     else:
         if l-r>50:
             print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
-
-print sum
 
 xy_flipped=False
 print (" score", p, m, get_change(p, m))
@@ -273,30 +268,25 @@ if p < m:
 print("testing y/z flip... %d x-slices" % vol_y1.shape[0])
 p=0
 m=0
-sum=0
 for i in range(vol_y1.shape[0]):
     slice1 = vol_y1[i, :, :]
     slice2 = vol_y2[i, :, :]
   
-    pos = np.subtract(slice1, slice2)#.clip(min=0)
+    pos = np.subtract(slice1, slice2).clip(min=0)
     pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
-    #neg = np.subtract(slice2, slice1).clip(min=0)
-    #neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
+    neg = np.subtract(slice2, slice1).clip(min=0)
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
 
     l=np.std(sum_diag(pos, 1))
     r=np.std(sum_diag(pos, -1))
-    #l+=np.std(sum_diag(neg, -1))
-    #r+=np.std(sum_diag(neg, 1))
-    sum+=l
-    sum-=r
+    l+=np.std(sum_diag(neg, -1))
+    r+=np.std(sum_diag(neg, 1))
     if l<=r:
         p+=1.0
     else:
         if l-r>50:
             print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
-
-print sum
 
 yz_flipped=False
 print (" score", p, m, get_change(p, m))
@@ -310,30 +300,25 @@ if p < m:
 print("testing x/z flip... %d y-slices" % vol_z1.shape[1])
 p=0
 m=0
-sum=0
 for i in range(vol_z1.shape[1]):
     slice1 = vol_z1[:, i, :]
     slice2 = vol_z2[:, i, :]
  
-    pos = np.subtract(slice1, slice2)#.clip(min=0)
+    pos = np.subtract(slice1, slice2).clip(min=0)
     pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
-    #neg = np.subtract(slice2, slice1).clip(min=0)
-    #neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
+    neg = np.subtract(slice2, slice1).clip(min=0)
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
 
     l=np.std(sum_diag(pos, 1))
     r=np.std(sum_diag(pos, -1))
-    #l+=np.std(sum_diag(neg, -1))
-    #r+=np.std(sum_diag(neg, 1))
-    sum+=l
-    sum-=r
+    l+=np.std(sum_diag(neg, -1))
+    r+=np.std(sum_diag(neg, 1))
     if l<=r:
         p+=1.0
     else:
         if l-r>50:
             print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
-
-print sum
 
 xz_flipped=False
 print (" score", p, m, get_change(p, m))
