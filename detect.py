@@ -43,6 +43,14 @@ def sum_diag(img, shift):
         #img[i] = sum #debug
     return sum
 
+def debug_diag(img, shift):
+    sum=img[0]
+    for i in range(1, img.shape[0]):
+        sum = np.roll(sum, shift)
+        sum = np.add(sum, img[i])
+        img[i] = sum
+    return sum
+
 with open('config.json') as config_json:
     config = json.load(config_json)
 
@@ -229,8 +237,9 @@ for i in range(vol_x1.shape[2]):
     slice2 = vol_x2[:, :, i]
   
     pos = np.subtract(slice1, slice2).clip(min=0)
-    pos=np.pad(pos, ((0,0),(0, pos.shape[0]/2)), 'constant')
+    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
     neg = np.subtract(slice2, slice1).clip(min=0)
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
 
     l=np.std(sum_diag(pos, 1))
     r=np.std(sum_diag(pos, -1))
@@ -260,14 +269,18 @@ for i in range(vol_y1.shape[0]):
     slice2 = vol_y2[i, :, :]
   
     pos = np.subtract(slice1, slice2).clip(min=0)
-    pos=np.pad(pos, ((0,0),(0, pos.shape[0]/2)), 'constant')
+    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
     neg = np.subtract(slice2, slice1).clip(min=0)
-    neg=np.pad(neg, ((0,0),(0, neg.shape[0]/2)), 'constant')
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
+
+    #print(i, "-----------------------------------")
+    #print(np.std(sum_diag(pos, 1))+np.std(sum_diag(pos, -1)), np.std(sum_diag(neg, -1))+np.std(sum_diag(neg, 1)))
 
     l=np.std(sum_diag(pos, 1))
     r=np.std(sum_diag(pos, -1))
     l+=np.std(sum_diag(neg, -1))
     r+=np.std(sum_diag(neg, 1))
+    #print(i, l<r, l-r)
     if l == r:
         continue
     if l<r:
@@ -292,9 +305,9 @@ for i in range(vol_z1.shape[1]):
     slice2 = vol_z2[:, i, :]
  
     pos = np.subtract(slice1, slice2).clip(min=0)
-    pos=np.pad(pos, ((0,0),(0, pos.shape[0]/2)), 'constant')
+    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
     neg = np.subtract(slice2, slice1).clip(min=0)
-    neg=np.pad(neg, ((0,0),(0, neg.shape[0]/2)), 'constant')
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
 
     l=np.std(sum_diag(pos, 1))
     r=np.std(sum_diag(pos, -1))
