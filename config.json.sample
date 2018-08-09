@@ -1,6 +1,6 @@
 {
-    "dwi": "/home/hayashis/Downloads/dwi.nii.gz",
-    "bvecs": "/home/hayashis/Downloads/dwi.bvecs",
-    "bvals": "/home/hayashis/Downloads/dwi.bvals"
+    "dwi": "testdata/yflip/dwi.nii.gz",
+    "bvecs": "testdata/yflip/dwi.bvecs",
+    "bvals": "testdata/yflip/dwi.bvals"
 }
 
