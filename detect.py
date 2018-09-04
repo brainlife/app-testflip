@@ -79,7 +79,7 @@ def get_change(current, previous):
         return 0
 
 print("analyzing bvecs/bvals")
-bvals, bvecs = read_bvals_bvecs(config['bvals'], config['bvecs'])
+bvals, bvecs = read_bvals_bvecs(config['bvals'], 'dwi.bvecs')
 try: 
     gtab = gradient_table(bvals, bvecs)
     print gtab
@@ -102,7 +102,7 @@ for i in range(len(gtab.bvals)):
 
 #do some basic image analysis
 try:
-    img = nibabel.load(config['dwi'])
+    img = nibabel.load('dwi_mni.nii.gz')
     print(img.header) 
 
     results['dwi_headers'] = str(img.header) #need to str() so that we can save it to product.json

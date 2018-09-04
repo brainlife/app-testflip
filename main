@@ -4,5 +4,9 @@
 #PBS -l vmem=8gb
 #PBS -l walltime=00:05:00
 
+set -e
+
+singularity exec -e docker://brainlife/fsl:5.0.9 ./register.sh
+
 SINGULARITYENV_PYTHONNOUSERSITE=true singularity exec -e docker://brainlife/dipy:0.14 ./detect.py
 

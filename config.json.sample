@@ -1,6 +1,9 @@
 {
-    "dwi": "testdata/bold5000/dwi.nii.gz",
-    "bvecs": "testdata/bold5000/dwi.bvecs",
-    "bvals": "testdata/bold5000/dwi.bvals"
+    "dwi": "testdata/abide2_28854/dwi.nii.gz",
+    "bvecs": "testdata/abide2_28854/dwi.bvecs",
+    "bvals": "testdata/abide2_28854/dwi.bvals",
+    "dwi-b": "testdata/bold5000/dwi.nii.gz",
+    "bvecs-b": "testdata/bold5000/dwi.bvecs",
+    "bvals-b": "testdata/bold5000/dwi.bvals"
 }
 
