@@ -43,6 +43,14 @@ def sum_diag(img, shift):
         #img[i] = sum #debug
     return sum
 
+def debug_diag(img, shift):
+    sum=img[0]
+    for i in range(1, img.shape[0]):
+        sum = np.roll(sum, shift)
+        sum = np.add(sum, img[i])
+        img[i] = sum
+    return sum
+
 with open('config.json') as config_json:
     config = json.load(config_json)
 
@@ -167,40 +175,44 @@ for idx in range(len(bvecs)):
     angs.append((x1_ang, x2_ang, y1_ang, y2_ang, z1_ang, z2_ang, bvec, bval, idx));
 
 print("x/y flip check")
+
 angs.sort(key=lambda tup: tup[0])
 x1 = angs[0][8]
 print(angs[0])
+print("loading volume: x1: %d" % x1)
+vol_x1 = img.dataobj[..., x1]
+
 angs.sort(key=lambda tup: tup[1])
 x2 = angs[0][8]
 print(angs[0])
-
-print("y/z flip check")
-angs.sort(key=lambda tup: tup[2])
-y1 = angs[0][8]
-print(angs[0])
-angs.sort(key=lambda tup: tup[3])
-y2 = angs[0][8]
-print(angs[0])
-print("x/z flip check")
-angs.sort(key=lambda tup: tup[4])
-z1 = angs[0][8]
-print(angs[0])
-angs.sort(key=lambda tup: tup[5])
-z2 = angs[0][8]
-print(angs[0])
-
-print("loading volume: x1: %d" % x1)
-vol_x1 = img.dataobj[..., x1]
 print("loading volume: x2: %d" % x2)
 vol_x2 = img.dataobj[..., x2]
 
+print("y/z flip check")
+
+angs.sort(key=lambda tup: tup[2])
+y1 = angs[0][8]
+print(angs[0])
 print("loading volume: y1: %d" % y1)
 vol_y1 = img.dataobj[..., y1]
+
+angs.sort(key=lambda tup: tup[3])
+y2 = angs[0][8]
+print(angs[0])
 print("loading volume: y2: %d" % y2)
 vol_y2 = img.dataobj[..., y2]
 
+print("x/z flip check")
+
+angs.sort(key=lambda tup: tup[4])
+z1 = angs[0][8]
+print(angs[0])
 print("loading volume: z1: %d" % z1)
 vol_z1 = img.dataobj[..., z1]
+
+angs.sort(key=lambda tup: tup[5])
+z2 = angs[0][8]
+print(angs[0])
 print("loading volume: z2: %d" % z2)
 vol_z2 = img.dataobj[..., z2]
 
@@ -220,7 +232,7 @@ noflip_v = []
 flip_v = []
 
 ###############################################################################################
-print("testing x/y flip...")
+print("testing x/y flip... %d z-slices" % vol_x1.shape[2])
 p=0
 m=0
 for i in range(vol_x1.shape[2]):
@@ -229,18 +241,19 @@ for i in range(vol_x1.shape[2]):
     slice2 = vol_x2[:, :, i]
   
     pos = np.subtract(slice1, slice2).clip(min=0)
-    pos=np.pad(pos, ((0,0),(0, pos.shape[0]/2)), 'constant')
+    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
     neg = np.subtract(slice2, slice1).clip(min=0)
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
 
     l=np.std(sum_diag(pos, 1))
     r=np.std(sum_diag(pos, -1))
     l+=np.std(sum_diag(neg, -1))
     r+=np.std(sum_diag(neg, 1))
-    if l == r:
-        continue
-    if l<r:
+    if l<=r:
         p+=1.0
     else:
+        if l-r>50:
+            print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
 
 xy_flipped=False
@@ -252,7 +265,7 @@ if p < m:
     xy_flipped=True
 
 ###############################################################################################
-print("testing y/z flip...")
+print("testing y/z flip... %d x-slices" % vol_y1.shape[0])
 p=0
 m=0
 for i in range(vol_y1.shape[0]):
@@ -260,19 +273,19 @@ for i in range(vol_y1.shape[0]):
     slice2 = vol_y2[i, :, :]
   
     pos = np.subtract(slice1, slice2).clip(min=0)
-    pos=np.pad(pos, ((0,0),(0, pos.shape[0]/2)), 'constant')
+    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
     neg = np.subtract(slice2, slice1).clip(min=0)
-    neg=np.pad(neg, ((0,0),(0, neg.shape[0]/2)), 'constant')
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
 
     l=np.std(sum_diag(pos, 1))
     r=np.std(sum_diag(pos, -1))
     l+=np.std(sum_diag(neg, -1))
     r+=np.std(sum_diag(neg, 1))
-    if l == r:
-        continue
-    if l<r:
+    if l<=r:
         p+=1.0
     else:
+        if l-r>50:
+            print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
 
 yz_flipped=False
@@ -284,7 +297,7 @@ if p < m:
     yz_flipped=True
 
 ###############################################################################################
-print("testing x/z flip...")
+print("testing x/z flip... %d y-slices" % vol_z1.shape[1])
 p=0
 m=0
 for i in range(vol_z1.shape[1]):
@@ -292,19 +305,19 @@ for i in range(vol_z1.shape[1]):
     slice2 = vol_z2[:, i, :]
  
     pos = np.subtract(slice1, slice2).clip(min=0)
-    pos=np.pad(pos, ((0,0),(0, pos.shape[0]/2)), 'constant')
+    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
     neg = np.subtract(slice2, slice1).clip(min=0)
-    neg=np.pad(neg, ((0,0),(0, neg.shape[0]/2)), 'constant')
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
 
     l=np.std(sum_diag(pos, 1))
     r=np.std(sum_diag(pos, -1))
     l+=np.std(sum_diag(neg, -1))
     r+=np.std(sum_diag(neg, 1))
-    if l == r:
-        continue
-    if l<r:
+    if l<=r:
         p+=1.0
     else:
+        if l-r>50:
+            print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
 
 xz_flipped=False
@@ -320,7 +333,7 @@ if p < m:
 
 if not xy_flipped and not yz_flipped and not xz_flipped:
     print("no flip!")
-    results['brainlife'].append({"type": "info", "msg": "No flip required!"})
+    results['brainlife'].append({"type": "info", "msg": "bvecs directions look good!"})
 
 if xy_flipped and xz_flipped:
     print("x is flipped !")
