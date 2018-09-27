@@ -87,7 +87,7 @@ def get_change(current, previous):
         return 0
 
 print("analyzing bvecs/bvals")
-bvals, bvecs = read_bvals_bvecs(config['bvals'], 'dwi.bvecs')
+bvals, bvecs = read_bvals_bvecs('dwi.bvals', 'dwi.bvecs')
 try: 
     gtab = gradient_table(bvals, bvecs)
     print gtab
