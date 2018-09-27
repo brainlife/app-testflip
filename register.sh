@@ -16,5 +16,6 @@ echo "now registering dwi to mni"
 flirt -in $(jq -r .dwi config.json) -ref $FSLDIR/data/standard/MNI152_T1_2mm_brain.nii.gz -o dwi_mni.nii.gz -applyxfm -init fa6.xfm 
 
 echo "rotating bvecs"
-./bvecs_rotate_xfm.sh dwi.bvecs dwi.bvecs fa6.xfm
+cp dwi.bvecs dwi.before_rotate.bvecs
+./bvecs_rotate_xfm.sh dwi.before_rotate.bvecs dwi.bvecs fa6.xfm
 
