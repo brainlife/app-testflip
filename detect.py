@@ -110,7 +110,7 @@ for i in range(len(gtab.bvals)):
 
 #do some basic image analysis
 try:
-    img = nibabel.load('dwi_mni.nii.gz')
+    img = nibabel.load('dwi.nii.gz')
     print(img.header) 
 
     results['dwi_headers'] = str(img.header) #need to str() so that we can save it to product.json
@@ -175,46 +175,46 @@ for idx in range(len(bvecs)):
     angs.append((x1_ang, x2_ang, y1_ang, y2_ang, z1_ang, z2_ang, bvec, bval, idx));
 
 print("x/y flip check")
-
 angs.sort(key=lambda tup: tup[0])
 x1 = angs[0][8]
-print(angs[0])
+#print(angs[0])
 print("loading volume: x1: %d" % x1)
-vol_x1 = img.dataobj[..., x1]
+vol_x1 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 angs.sort(key=lambda tup: tup[1])
 x2 = angs[0][8]
-print(angs[0])
+#print(angs[0])
 print("loading volume: x2: %d" % x2)
-vol_x2 = img.dataobj[..., x2]
+vol_x2 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 print("y/z flip check")
-
 angs.sort(key=lambda tup: tup[2])
 y1 = angs[0][8]
-print(angs[0])
+#print(angs[0])
 print("loading volume: y1: %d" % y1)
-vol_y1 = img.dataobj[..., y1]
+vol_y1 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 angs.sort(key=lambda tup: tup[3])
 y2 = angs[0][8]
-print(angs[0])
+#print(angs[0])
 print("loading volume: y2: %d" % y2)
-vol_y2 = img.dataobj[..., y2]
+#vol_y2 = img.dataobj[..., y2]
+vol_y2 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 print("x/z flip check")
-
 angs.sort(key=lambda tup: tup[4])
 z1 = angs[0][8]
-print(angs[0])
+#print(angs[0])
 print("loading volume: z1: %d" % z1)
-vol_z1 = img.dataobj[..., z1]
+#vol_z1 = img.dataobj[..., z1]
+vol_z1 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 angs.sort(key=lambda tup: tup[5])
 z2 = angs[0][8]
-print(angs[0])
+#print(angs[0])
 print("loading volume: z2: %d" % z2)
-vol_z2 = img.dataobj[..., z2]
+#vol_z2 = img.dataobj[..., z2]
+vol_z2 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 #store diff images for debugging purpose
 print ("storing diff images")
@@ -257,7 +257,9 @@ for i in range(vol_x1.shape[2]):
         m+=1.0
 
 xy_flipped=False
-print (" score", p, m, get_change(p, m))
+print ("noflip", p)
+print ("flip", m)
+#, get_change(p, m))
 noflip_v.append(p)
 flip_v.append(m)
 if p < m:
@@ -289,7 +291,9 @@ for i in range(vol_y1.shape[0]):
         m+=1.0
 
 yz_flipped=False
-print (" score", p, m, get_change(p, m))
+#print (" score", p, m, get_change(p, m))
+print ("noflip", p)
+print ("flip", m)
 noflip_v.append(p)
 flip_v.append(m)
 if p < m:
@@ -321,7 +325,9 @@ for i in range(vol_z1.shape[1]):
         m+=1.0
 
 xz_flipped=False
-print (" score", p, m, get_change(p, m))
+#print (" score", p, m, get_change(p, m))
+print ("noflip", p)
+print ("flip", m)
 noflip_v.append(p)
 flip_v.append(m)
 if p < m:
