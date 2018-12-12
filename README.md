@@ -5,6 +5,9 @@
 
 Incorrect bvecs polarity would lead to incorrect processing of DWI data. This app will quickly check the dwi image to see if any bvecs directions needs to be flipped. The algorithm find bvecs that are pointing toward certain direction and find the volume slice within 4D DWI data and see if the image indeed seems to contain features that are orthogonal to the bvecs directions.
 
+[![flip](testflip.png)]
+* example of y-flipped image
+
 The algorithm requires the brain image to be aligned parallel to x/y/z axis. This App runs bets and flirt to align the data to MNI coordinate before analyzing bvecs flipping.
 
 More detailed description of this algorithm is currently in the works.
