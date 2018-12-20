@@ -78,7 +78,17 @@ The App will create a file `product.json` on the current working directory. This
 
 The product.json also contains plotly graph data so you can ploy them using ploytly or other similar libraries.
 
-![plot](graph.png)
+### Example of output from high SNR image
+![plot](noflip_good.png)
+This plot shows that most slices clearly shows evidence of no flip.
+
+### Example of output from low SNR / low quality image.
+![plot](noflip_bad.png)
+This plot shows that images does not look like flipped but X/Y, Y/Z are close to inconclusive. Image might be blurry, or has low SNR. 
+
+### Example of output from y-flipped image.
+![plot](flip.png)
+This plot shows that x/y, y/z are flipped. Since the common axis on x/y and y/z are y, we conclude that y axis is flipped. However the flip evidence is close to inconclusive similar to above plot Image might be blurry, or has low SNR.
 
 ### Dependencies
 
