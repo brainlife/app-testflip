@@ -102,7 +102,7 @@ shells = {}
 for i in range(len(gtab.bvals)):
     bval = gtab.bvals[i]
     bvec = gtab.bvecs[i]
-    shell = str(round(bval, -3))
+    shell = str(round(bval, -2))
     if shell not in shells:
         shells[shell] = []
     shells[shell].append((i, bval, bvec*bval))
