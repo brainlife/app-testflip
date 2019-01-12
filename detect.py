@@ -97,16 +97,15 @@ except ValueError,e:
     #re-try with rediculous atol to bypass the check (some data has [0,0,0] vector!
     gtab = gradient_table(bvals, bvecs, atol=1)
 
-#sort into shells (1000th)
+#sort into shells (100th)
 shells = {}
 for i in range(len(gtab.bvals)):
     bval = gtab.bvals[i]
     bvec = gtab.bvecs[i]
-    shell = str(round(bval, -3))
+    shell = str(round(bval, -2))
     if shell not in shells:
         shells[shell] = []
     shells[shell].append((i, bval, bvec*bval))
-
 
 #do some basic image analysis
 try:
