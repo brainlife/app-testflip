@@ -5,6 +5,9 @@
 
 Incorrect bvecs polarity would lead to incorrect processing of DWI data. This app will quickly check the dwi image to see if any bvecs directions needs to be flipped. The algorithm find bvecs that are pointing toward certain direction and find the volume slice within 4D DWI data and see if the image indeed seems to contain features that are orthogonal to the bvecs directions.
 
+[![flip](testflip.png)]
+* example of y-flipped image
+
 The algorithm requires the brain image to be aligned parallel to x/y/z axis. This App runs bets and flirt to align the data to MNI coordinate before analyzing bvecs flipping.
 
 More detailed description of this algorithm is currently in the works.
@@ -75,7 +78,20 @@ The App will create a file `product.json` on the current working directory. This
 
 The product.json also contains plotly graph data so you can ploy them using ploytly or other similar libraries.
 
-![plot](graph.png)
+### Example of output from high SNR image
+![plot](noflip_good.png)
+
+This plot shows that most slices has very low evidence of no flip.
+
+### Example of output from low SNR / low quality image.
+![plot](noflip_bad.png)
+
+This plot shows that the image does not seem to be flipped, however, X/Y and Y/Z are close to being inconclusive. The image might be blurry, or has low SNR. 
+
+### Example of output from y-flipped image.
+![plot](flip.png)
+
+This plot shows that x/y, y/z are flipped. Since the common axis on x/y and y/z are y, we conclude that y axis is flipped in bvecs. However the flip evidence is close to inconclusiv. The image might be blurry, or has low SNR.
 
 ### Dependencies
 
