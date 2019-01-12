@@ -32,7 +32,7 @@ def most_common(bvals):
     round_bvals = []
     for bval in bvals:
         round_bvals.append(round(bval, -2))
-    return max(set(round_bvals), key=bvals.count)
+    return max(round_bvals, key=round_bvals.count)
 
 #the heart of flip detection.. believe it or not..
 def sum_diag(img, shift):
