@@ -5,12 +5,11 @@
 
 Incorrect bvecs polarity would lead to incorrect processing of DWI data. This app will quickly check the dwi image to see if any bvecs directions needs to be flipped. The algorithm find bvecs that are pointing toward certain direction and find the volume slice within 4D DWI data and see if the image indeed seems to contain features that are orthogonal to the bvecs directions.
 
-[![flip](testflip.png)]
-* example of y-flipped image
+An example of y-flipped image
 
-The algorithm requires the brain image to be aligned parallel to x/y/z axis. This App runs bets and flirt to align the data to MNI coordinate before analyzing bvecs flipping.
+[![flip](img/testflip.png)]
 
-More detailed description of this algorithm is currently in the works.
+This App uses a simple algorithm to analyze directionality of the diffusion signals for each slices and determies if the image appears to have correct bvecs orientation overall. A detailed description of this algorithm is currently in the works.
 
 ### Authors
 - Soichi Hayashi (hayashis@iu.edu)
@@ -79,19 +78,25 @@ The App will create a file `product.json` on the current working directory. This
 The product.json also contains plotly graph data so you can ploy them using ploytly or other similar libraries.
 
 ### Example of output from high SNR image
-![plot](noflip_good.png)
+![plot](img/noflip_good.png)
 
 This plot shows that most slices has very low evidence of no flip.
 
 ### Example of output from low SNR / low quality image.
-![plot](noflip_bad.png)
+![plot](img/noflip_bad.png)
 
 This plot shows that the image does not seem to be flipped, however, X/Y and Y/Z are close to being inconclusive. The image might be blurry, or has low SNR. 
 
 ### Example of output from y-flipped image.
-![plot](flip.png)
+![plot](img/flip.png)
 
 This plot shows that x/y, y/z are flipped. Since the common axis on x/y and y/z are y, we conclude that y axis is flipped in bvecs. However the flip evidence is close to inconclusiv. The image might be blurry, or has low SNR.
+
+### Other Outputs
+
+This App also generates plotly graphs showing the arrangements of gradient vectors.
+
+![gradients](img/gradients.png)
 
 ### Dependencies
 
