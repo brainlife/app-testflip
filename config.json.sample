@@ -1,10 +1,6 @@
 {
-    "dwi": "testdata/abide2_28854/dwi.nii.gz",
-    "bvecs": "testdata/abide2_28854/dwi.bvecs",
-    "bvals": "testdata/abide2_28854/dwi.bvals",
-    "dwi-b": "testdata/bold5000/dwi.nii.gz",
-    "bvecs-b": "testdata/bold5000/dwi.bvecs",
-    "bvals-b": "testdata/bold5000/dwi.bvals",
-    "register": false
+    "dwi": "testdata/dwi.nii.gz",
+    "bvecs": "testdata/dwi.bvecs",
+    "bvals": "testdata/dwi.bvals"
 }
 

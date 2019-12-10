@@ -1,19 +1,18 @@
 #!/bin/bash
-
 #PBS -l nodes=1:ppn=1
 #PBS -l vmem=8gb
 #PBS -l walltime=00:20:00
 
 set -e
 
-if [ $(jq -r .flip config.json) == "true" ]; then
-    echo "registering to mni"
-    singularity exec -e docker://brainlife/fsl:5.0.9 ./register.sh
-else
-    ln -sf $(jq -r .dwi config.json) dwi.nii.gz
-    ln -sf $(jq -r .bvecs config.json) dwi.bvecs
-    ln -sf $(jq -r .bvals config.json) dwi.bvals
-fi
+#if [ $(jq -r .flip config.json) == "true" ]; then
+#    echo "registering to mni"
+#    singularity exec -e docker://brainlife/fsl:5.0.9 ./register.sh
+#else
+#ln -sf $(jq -r .dwi config.json) dwi.nii.gz
+#ln -sf $(jq -r .bvecs config.json) dwi.bvecs
+#ln -sf $(jq -r .bvals config.json) dwi.bvals
+#fi
 
 echo "running detect"
 SINGULARITYENV_PYTHONNOUSERSITE=true singularity exec -e docker://brainlife/dipy:0.14 ./detect.py
