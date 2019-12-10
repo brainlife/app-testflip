@@ -11,6 +11,9 @@ from dipy.core.gradients import gradient_table
 import math
 import numpy as np
 
+from json import encoder
+encoder.FLOAT_REPR = lambda o: format(o, '.2f')
+
 with open('config.json') as config_json:
     config = json.load(config_json)
 
@@ -54,9 +57,6 @@ def debug_diag(img, shift):
         img[i] = sum
     return sum
 
-with open('config.json') as config_json:
-    config = json.load(config_json)
-
 results = {"brainlife": []}
 directions = None
 gtab = None
@@ -93,9 +93,9 @@ print("analyzing bvecs/bvals")
 bvals, bvecs = read_bvals_bvecs(config['bvals'], config['bvecs'])
 try: 
     gtab = gradient_table(bvals, bvecs)
-    print gtab
-except ValueError,e:
-    warning(str(e))
+    print(gtab)
+except ValueError:
+    warning("Invalid gradient table")
 
     #re-try with rediculous atol to bypass the check (some data has [0,0,0] vector!
     gtab = gradient_table(bvals, bvecs, atol=1)
@@ -262,12 +262,12 @@ for i in range(vol_x1.shape[2]):
     if l<=r:
         p+=1.0
         xy_scores_f.append(None)
-        xy_scores_nf.append(r-l)
+        xy_scores_nf.append(float(r-l))
     else:
         if l-r>50:
             print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
-        xy_scores_f.append(r-l)
+        xy_scores_f.append(float(r-l))
         xy_scores_nf.append(None)
 
 xy_flipped=False
@@ -300,12 +300,12 @@ for i in range(vol_y1.shape[0]):
     if l<=r:
         p+=1.0
         yz_scores_f.append(None)
-        yz_scores_nf.append(r-l)
+        yz_scores_nf.append(float(r-l))
     else:
         if l-r>50:
             print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
-        yz_scores_f.append(r-l)
+        yz_scores_f.append(float(r-l))
         yz_scores_nf.append(None)
 
 yz_flipped=False
@@ -338,12 +338,12 @@ for i in range(vol_z1.shape[1]):
     if l<=r:
         p+=1.0
         xz_scores_f.append(None)
-        xz_scores_nf.append(r-l)
+        xz_scores_nf.append(float(r-l))
     else:
         if l-r>50:
             print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
-        xz_scores_f.append(r-l)
+        xz_scores_f.append(float(r-l))
         xz_scores_nf.append(None)
 
 xz_flipped=False
@@ -533,7 +533,13 @@ results['brainlife'].append({
         }
     ],
 })
+#print(xy_scores_nf)
+#print(xy_scores_f)
+#json.dumps([1,2,3])
 
 with open("product.json", "w") as fp:
     json.dump(results, fp)
+
+print("finished")
+
 
