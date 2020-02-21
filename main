@@ -15,5 +15,5 @@ set -e
 #fi
 
 echo "running detect"
-SINGULARITYENV_PYTHONNOUSERSITE=true singularity exec -e docker://brainlife/dipy:0.14 ./detect.py
+SINGULARITYENV_PYTHONNOUSERSITE=true singularity exec -e docker://brainlife/dipy:1.1.1 ./detect.py
 

@@ -1,4 +1,4 @@
-#!/usr/bin/python -u
+#!/usr/bin/python3 -u
 
 import os
 import json
@@ -10,6 +10,10 @@ from dipy.core.gradients import gradient_table
 
 import math
 import numpy as np
+
+#import matplotlib
+#import imageio
+from scipy.ndimage import zoom
 
 from json import encoder
 encoder.FLOAT_REPR = lambda o: format(o, '.2f')
@@ -40,22 +44,21 @@ def most_common(bvals):
         round_bvals.append(round(bval, -2))
     return max(round_bvals, key=round_bvals.count)
 
-#the heart of flip detection.. believe it or not..
+#the heart of flip detection.. 
 def sum_diag(img, shift):
     sum=img[0]
     for i in range(1, img.shape[0]):
         sum = np.roll(sum, shift)
         sum = np.add(sum, img[i])
-        #img[i] = sum #debug
     return sum
 
-def debug_diag(img, shift):
-    sum=img[0]
-    for i in range(1, img.shape[0]):
-        sum = np.roll(sum, shift)
-        sum = np.add(sum, img[i])
-        img[i] = sum
-    return sum
+#def debug_diag(img, shift):
+#    sum=img[0]
+#    for i in range(1, img.shape[0]):
+#        sum = np.roll(sum, shift)
+#        sum = np.add(sum, img[i])
+#        img[i] = sum
+#    return sum
 
 results = {"brainlife": []}
 directions = None
@@ -117,7 +120,14 @@ try:
 
     results['dwi_headers'] = str(img.header) #need to str() so that we can save it to product.json
     results['dwi_affine'] = str(img.affine) #need to str() as array is not serializable
-    
+
+    dimX = img.header["pixdim"][1]
+    dimY = img.header["pixdim"][2]
+    dimZ = img.header["pixdim"][3]
+    #dimD = img.header["pixdim"][4]
+    if abs(dimX - dimY) > dimX*0.1 or abs(dimX - dimZ) > dimX*0.1 or abs(dimY - dimZ) > dimX*0.1:
+        warning("pixdim is not close to isomorphic.. some dwi processing might fail")
+
     #determine storage orientation
     #http://community.mrtrix.org/t/mrconvert-flips-gradients/581/6
     det = np.linalg.det(img.affine)
@@ -176,57 +186,55 @@ for idx in range(len(bvecs)):
     z2_ang = flip_angle(angle_between(bvec, (1,0,-1)))
     angs.append((x1_ang, x2_ang, y1_ang, y2_ang, z1_ang, z2_ang, bvec, bval, idx));
 
+
+#https://github.com/nipy/nibabel/issues/670#issuecomment-426677933
+#TODO - resize image to make all pixel isomorphic
+
 print("x/y flip check")
 angs.sort(key=lambda tup: tup[0])
 x1 = angs[0][8]
-#print(angs[0])
 print("loading volume: x1: %d" % x1)
 vol_x1 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 angs.sort(key=lambda tup: tup[1])
 x2 = angs[0][8]
-#print(angs[0])
 print("loading volume: x2: %d" % x2)
 vol_x2 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 print("y/z flip check")
 angs.sort(key=lambda tup: tup[2])
 y1 = angs[0][8]
-#print(angs[0])
 print("loading volume: y1: %d" % y1)
 vol_y1 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 angs.sort(key=lambda tup: tup[3])
 y2 = angs[0][8]
-#print(angs[0])
 print("loading volume: y2: %d" % y2)
-#vol_y2 = img.dataobj[..., y2]
 vol_y2 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 print("x/z flip check")
 angs.sort(key=lambda tup: tup[4])
 z1 = angs[0][8]
-#print(angs[0])
 print("loading volume: z1: %d" % z1)
-#vol_z1 = img.dataobj[..., z1]
 vol_z1 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 angs.sort(key=lambda tup: tup[5])
 z2 = angs[0][8]
-#print(angs[0])
 print("loading volume: z2: %d" % z2)
-#vol_z2 = img.dataobj[..., z2]
 vol_z2 = img.dataobj[..., angs[0][8]] + img.dataobj[..., angs[1][8]] + img.dataobj[..., angs[2][8]]
 
 #store diff images for debugging purpose
-print ("storing diff images")
-dif_vol = vol_x1-vol_x2
+print ("storing sample diff images")
+
+dif_vol = vol_x1#-vol_x2
 img = nibabel.Nifti1Image(dif_vol, np.eye(4))
 nibabel.save(img, "xy.nii.gz")
-dif_vol = vol_y1-vol_y2
+
+dif_vol = vol_y1#-vol_y2
 img = nibabel.Nifti1Image(dif_vol, np.eye(4))
 nibabel.save(img, "yz.nii.gz")
-dif_vol = vol_z1-vol_z2
+
+dif_vol = vol_z1#-vol_z2
 img = nibabel.Nifti1Image(dif_vol, np.eye(4))
 nibabel.save(img, "xz.nii.gz")
 
@@ -247,29 +255,37 @@ p=0
 m=0
 for i in range(vol_x1.shape[2]):
     
-    slice1 = vol_x1[:, :, i]
-    slice2 = vol_x2[:, :, i]
+    slice1 = vol_x1[:, :, i].astype('float32')
+    slice2 = vol_x2[:, :, i].astype('float32')
+
+    #slice1 -= np.min(slice1)
+    #slice1 /= np.std(slice1)
+    #slice2 -= np.min(slice2)
+    #slice2 /= np.std(slice2)
+
+    slice1 = zoom(slice1, [dimX, dimY])
+    slice2 = zoom(slice2, [dimX, dimY])
   
     pos = np.subtract(slice1, slice2).clip(min=0)
-    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
+    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), mode="constant")
     neg = np.subtract(slice2, slice1).clip(min=0)
-    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), mode="constant")
 
-    l=np.std(sum_diag(pos, 1))
-    r=np.std(sum_diag(pos, -1))
-    l+=np.std(sum_diag(neg, -1))
-    r+=np.std(sum_diag(neg, 1))
+    l=np.max(sum_diag(pos, 1))
+    r=np.max(sum_diag(pos, -1))
+    l+=np.max(sum_diag(neg, -1))
+    r+=np.max(sum_diag(neg, 1))
     if l<=r:
         p+=1.0
         xy_scores_f.append(None)
         xy_scores_nf.append(float(r-l))
+        print(i, r-l)
     else:
-        if l-r>50:
-            print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
         xy_scores_f.append(float(r-l))
         xy_scores_nf.append(None)
-
+        print(i, r-l, "flip?")
+    
 xy_flipped=False
 print ("noflip", p)
 print ("flip", m)
@@ -285,31 +301,33 @@ print("testing y/z flip... %d x-slices" % vol_y1.shape[0])
 p=0
 m=0
 for i in range(vol_y1.shape[0]):
-    slice1 = vol_y1[i, :, :]
-    slice2 = vol_y2[i, :, :]
+    slice1 = vol_y1[i, :, :].astype('float32')
+    slice2 = vol_y2[i, :, :].astype('float32')
+
+    slice1 = zoom(slice1, [dimY, dimZ])
+    slice2 = zoom(slice2, [dimY, dimZ])
   
     pos = np.subtract(slice1, slice2).clip(min=0)
-    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
+    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), mode="constant")
     neg = np.subtract(slice2, slice1).clip(min=0)
-    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), mode="constant")
 
-    l=np.std(sum_diag(pos, 1))
-    r=np.std(sum_diag(pos, -1))
-    l+=np.std(sum_diag(neg, -1))
-    r+=np.std(sum_diag(neg, 1))
+    l=np.max(sum_diag(pos, 1))
+    r=np.max(sum_diag(pos, -1))
+    l+=np.max(sum_diag(neg, -1))
+    r+=np.max(sum_diag(neg, 1))
     if l<=r:
         p+=1.0
         yz_scores_f.append(None)
         yz_scores_nf.append(float(r-l))
+        print(i, r-l)
     else:
-        if l-r>50:
-            print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
         yz_scores_f.append(float(r-l))
         yz_scores_nf.append(None)
-
+        print(i, r-l, "flip?")
+    
 yz_flipped=False
-#print (" score", p, m, get_change(p, m))
 print ("noflip", p)
 print ("flip", m)
 noflip_v.append(p)
@@ -323,31 +341,40 @@ print("testing x/z flip... %d y-slices" % vol_z1.shape[1])
 p=0
 m=0
 for i in range(vol_z1.shape[1]):
-    slice1 = vol_z1[:, i, :]
-    slice2 = vol_z2[:, i, :]
- 
-    pos = np.subtract(slice1, slice2).clip(min=0)
-    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), 'constant')
-    neg = np.subtract(slice2, slice1).clip(min=0)
-    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), 'constant')
+    slice1 = vol_z1[:, i, :].astype('float32')
+    slice2 = vol_z2[:, i, :].astype('float32')
 
-    l=np.std(sum_diag(pos, 1))
-    r=np.std(sum_diag(pos, -1))
-    l+=np.std(sum_diag(neg, -1))
-    r+=np.std(sum_diag(neg, 1))
+    #take pixdim into account 
+    #TODO - this makes it worse! why!?
+    #maybe this ends up accentulating the noise while not really picking up directional features?
+    slice1 = zoom(slice1, [dimX, dimZ])
+    slice2 = zoom(slice2, [dimX, dimZ])
+
+    pos = np.subtract(slice1, slice2).clip(min=0)
+    pos=np.pad(pos, ((0,0),(0, pos.shape[0])), mode="constant")
+    neg = np.subtract(slice2, slice1).clip(min=0)
+    neg=np.pad(neg, ((0,0),(0, neg.shape[0])), mode="constant")
+
+    l=np.max(sum_diag(pos, 1))
+    r=np.max(sum_diag(pos, -1))
+    l+=np.max(sum_diag(neg, -1))
+    r+=np.max(sum_diag(neg, 1))
     if l<=r:
         p+=1.0
         xz_scores_f.append(None)
         xz_scores_nf.append(float(r-l))
+        print(i, r-l)
     else:
-        if l-r>50:
-            print(i, "seems to be flipped", l,r,l-r)
         m+=1.0
         xz_scores_f.append(float(r-l))
         xz_scores_nf.append(None)
+        print(i, r-l, "flip!")
+
+    #if i == 183:
+    #    imageio.imsave('xz.183.pos.png', np.transpose(pos))
+    #    imageio.imsave('xz.183.neg.png', np.transpose(neg))
 
 xz_flipped=False
-#print (" score", p, m, get_change(p, m))
 print ("noflip", p)
 print ("flip", m)
 noflip_v.append(p)
@@ -533,9 +560,6 @@ results['brainlife'].append({
         }
     ],
 })
-#print(xy_scores_nf)
-#print(xy_scores_f)
-#json.dumps([1,2,3])
 
 with open("product.json", "w") as fp:
     json.dump(results, fp)

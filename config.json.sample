@@ -1,6 +1,15 @@
 {
-    "dwi": "testdata/incon/dwi.nii.gz",
-    "bvecs": "testdata/incon/dwi.bvecs",
-    "bvals": "testdata/incon/dwi.bvals"
+    "dwi-1": "testdata/noniso/dwi.nii.gz",
+    "bvecs-1": "testdata/noniso/dwi.bvecs",
+    "bvals-1": "testdata/noniso/dwi.bvals",
+    "dwi-2": "testdata/noflip/dwi.nii.gz",
+    "bvecs-2": "testdata/noflip/dwi.bvecs",
+    "bvals-2": "testdata/noflip/dwi.bvals",
+    "dwi-3": "testdata/zflip/dwi.nii.gz",
+    "bvecs-3": "testdata/zflip/dwi.bvecs",
+    "bvals-3": "testdata/zflip/dwi.bvals",
+    "dwi": "testdata/soichi-xf/dwi.nii.gz",
+    "bvecs": "testdata/soichi-xf/dwi.bvecs",
+    "bvals": "testdata/soichi-xf/dwi.bvals"
 }
 
