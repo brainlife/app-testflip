@@ -140,12 +140,19 @@ try:
         print('storage_orientation: radiological (det<0). good!')
     else:
         results['storage_orientation'] = 'neurological'
-        print('storage_orientation: neurological - flipping x')
-        warning("storage orientation is neurologial (det>0). Watch out!")
+        print('storage_orientation: neurological - flipping bvecs-x for detection')
+        warning("storage orientation is neurologial (det>0). Watch out! (https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FDT/FAQ#What_conventions_do_the_bvecs_use.3F)")
         results['tags'] = ["neurological"]
+        
+        #for neurological data, we need to flip bvec-x according to https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FDT/FAQ#What_conventions_do_the_bvecs_use.3F
+        for bvec in bvecs:
+            bvec[0] = -bvec[0]
+
+    print("aff2axcodes:", nibabel.aff2axcodes(img.affine))
 
 except Exception as e:
     error("nibabel failed on dwi. error code: " + str(e))
+
 
 ###############################################################################################
 #
@@ -185,7 +192,6 @@ for idx in range(len(bvecs)):
     z1_ang = flip_angle(angle_between(bvec, (1,0,1)))
     z2_ang = flip_angle(angle_between(bvec, (1,0,-1)))
     angs.append((x1_ang, x2_ang, y1_ang, y2_ang, z1_ang, z2_ang, bvec, bval, idx));
-
 
 #https://github.com/nipy/nibabel/issues/670#issuecomment-426677933
 #TODO - resize image to make all pixel isomorphic
