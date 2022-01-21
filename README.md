@@ -11,6 +11,11 @@ An example of y-flipped image
 
 This App uses a simple algorithm to analyze directionality of the diffusion signals for each slices and determies if the image appears to have correct bvecs orientation overall. A detailed description of this algorithm is currently in the works.
 
+By "correct" orientation, this algorithm uses the following FSL definitions for bvecs.
+
+> https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/FDT/FAQ#What_conventions_do_the_bvecs_use.3F
+
+
 ### Authors
 - Soichi Hayashi (hayashis@iu.edu)
 
