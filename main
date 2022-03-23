@@ -17,6 +17,7 @@ set -e
 echo "running detect"
 SINGULARITYENV_PYTHONNOUSERSITE=true singularity exec -e docker://brainlife/dipy:1.1.1 ./detect.py
 
+#TODO - we probably need to register new datatype to store this (and make it analysis)
 echo "creating a small raw output"
 mkdir -p output
 cp product.json output
