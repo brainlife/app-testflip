@@ -153,7 +153,6 @@ try:
 except Exception as e:
     error("nibabel failed on dwi. error code: " + str(e))
 
-
 ###############################################################################################
 #
 # check bvecs flipping
@@ -195,6 +194,9 @@ for idx in range(len(bvecs)):
 
 #https://github.com/nipy/nibabel/issues/670#issuecomment-426677933
 #TODO - resize image to make all pixel isomorphic
+
+if len(angs) < 10: #TODO - not sure how small is too small
+    print("we have too few volume to run flip test.. but proceeding to see what happens")
 
 print("x/y flip check")
 angs.sort(key=lambda tup: tup[0])
