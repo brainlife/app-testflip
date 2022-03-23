@@ -21,4 +21,4 @@ echo "creating a small raw output"
 mkdir -p output
 cp product.json output
 cp *.nii.gz output
-cp *.log output
+cp $(ls -t "*.log" | head -1) output/output.log
